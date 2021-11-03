@@ -1,0 +1,1 @@
+export const MESSAGGE_WARNING_EMPTY = '¡No hay registros para mostrar!'

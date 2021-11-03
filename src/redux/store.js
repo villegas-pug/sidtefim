@@ -19,6 +19,7 @@ import distritoReducer from 'redux/reducers/distritoReducer'
 import tipoInfraccionReducer from 'redux/reducers/tipoInfraccionReducer'
 import produccionReducer from 'redux/reducers/produccionReducer'
 import nacionalizacionReducer from 'redux/reducers/nacionalizacionReducer'
+import expedienteMininterReducer from './reducers/expedienteMininterReducer'
 import preInscripcionReducer from 'redux/reducers/preInscripcionReducer'
 import refugiadoReducer from 'redux/reducers/refugiadoReducer'
 
@@ -43,6 +44,7 @@ const reducers = combineReducers({
    tipoInfraccion: tipoInfraccionReducer,
    produccion: produccionReducer,
    nacionalizacion: nacionalizacionReducer,
+   expedienteMininter: expedienteMininterReducer,
    preInscripcion: preInscripcionReducer,
    refugiado: refugiadoReducer,
 

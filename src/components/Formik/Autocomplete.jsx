@@ -30,7 +30,7 @@ export default function MyAutocomplete({ name, label, width, opt, handleChangeUn
    /*» HANDLER  */
    const handleOnChange = (e, obj) => {
       setFieldValue([name], obj)
-      handleChangeUncontrolled({ [name]: obj })
+      handleChangeUncontrolled && handleChangeUncontrolled({ [name]: obj })
    }
    const handleOnInputChange = (e, value) => { setInputValue(value) }
    const handleOnInputBlur = () => { setTouched(true) }

@@ -6,6 +6,7 @@ export const httpStatus = {
    CREATED: 201,
    ACCEPTED: 202,
    INFORMATION: 203,
+   NO_CONTENT: 204,
    STATUS: 207,
    REPORTED: 208,
    USED: 226,

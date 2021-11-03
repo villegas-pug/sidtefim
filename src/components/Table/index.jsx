@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import MaterialTable from 'material-table'
 import { Icons } from 'helpers/icons'
 import PropTypes from 'prop-types'
@@ -16,16 +16,14 @@ function Table(props) {
       ...rest
    } = props
 
-   /*» HOOK'S  */
-   const [state, setState] = useState({ columns })
-
-   /*» EFFECT'S  */
-   useEffect(() => { setState((prevState) => ({ ...prevState, data })) }, [data])
-
    return (
       <>
          <MaterialTable
             isLoading={isLoading}
+            columns={columns}
+            data={data}
+            actions={actions}
+            components={{ Action: components }}
             icons={Icons}
             options={{ 
                ...options, 
@@ -34,18 +32,20 @@ function Table(props) {
                rowStyle: { fontSize: 10, textTransform: 'uppercase' },
             }}
             localization={{ 
-               header: { actions: 'Acciones' }, 
-               pagination: { labelDisplayedRows: '{from}-{to} de {count}' },
+               header: { actions: '««»»' }, 
+               pagination: { 
+                  labelDisplayedRows: '{from}-{to} de {count}',
+                  firstTooltip: '',
+                  nextTooltip: '',
+                  previousTooltip: '',
+                  lastTooltip: ''
+               },
                body:{
                   emptyDataSourceMessage:(
-                     <Typography variant='h4' color='textSecondary'>««« No existen datos para mostrar »»»</Typography>
+                     <Typography variant='h3' color='textSecondary'>««« »»»</Typography>
                   )
                }
             }}
-            columns={state.columns}
-            data={state.data}
-            actions={actions}
-            components={{ Action: components }}
          />
       </>
    )
@@ -76,6 +76,4 @@ Table.propTypes = {
    options: PropTypes.object.isRequired
 }
 
-export default React.memo(Table, (prevProps, nextProps) => {
-   return prevProps.isLoading === nextProps.isLoading
-}) 
+export default React.memo(Table, (prevProps, nextProps) => prevProps.isLoading === nextProps.isLoading) 
