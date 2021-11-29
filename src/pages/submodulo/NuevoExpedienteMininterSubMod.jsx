@@ -257,8 +257,8 @@ function FormToAddTrace({ handleModalAddTrace, recordDetExpMininter }){
          accionesRealizadas: recordDetExpMininter.accionesRealizadas,
       },
       validationSchema: Yup.object({
-         numeroOficio: Yup.string().required('¡Campo requerido!'),
-         fechaOficio: Yup.date().required('¡Campo requerido!'),
+         /* numeroOficio: Yup.string().required('¡Campo requerido!'),
+         fechaOficio: Yup.date().required('¡Campo requerido!'),*/
          fechaRecepcion: Yup.date().required('¡Campo requerido!'),
          ubicacion: Yup.object().required('¡Campo requerido!'),
       }),
