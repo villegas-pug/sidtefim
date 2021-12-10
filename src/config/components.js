@@ -15,6 +15,7 @@ const NuevoOperativoSubMod = lazy(() => import('pages/submodulo/NuevoOperativoSu
 const NuevoInterpolSubMod = lazy(() => import('pages/submodulo/NuevoInterpolSubMod'))
 const NuevaActividadSubMod = lazy(() => import('pages/submodulo/NuevaActividadSubMod'))
 const NuevoExpedienteMininterSubMod = lazy(() => import('pages/submodulo/NuevoExpedienteMininterSubMod'))
+const NuevoOficioSubMod = lazy(() => import('pages/submodulo/NuevoOficioSubMod'))
 const BuscarInterpolSubMod = lazy(() => import('pages/submodulo/BuscarInterpolSubMod'))  
 const BuscarOperativoSubMod = lazy(() => import('pages/submodulo/BuscarOperativoSubMod'))
 const BuscarPreInscripcionSubMod = lazy(() => import('pages/submodulo/BuscarPreInscripcionSubMod'))
@@ -24,6 +25,7 @@ const RegistrarActividad = lazy(() => import('pages/submodulo/RegistrarActividad
 const ProduccionRptSubMod = lazy(() => import('pages/submodulo/ProduccionRptSubMod'))
 const NacionalizacionRptSubMod = lazy(() => import('pages/submodulo/NacionalizacionRptSubMod'))
 const ExpedienteMininterRptSubMod = lazy(() => import('pages/submodulo/ExpedienteMininterRptSubMod'))
+
 
 
 /*» ITEM'S */
@@ -69,6 +71,9 @@ const subModulo = [
    }, {
       name: subModName.NUEVO_EXPEDIENTE_MININTER,
       component: NuevoExpedienteMininterSubMod
+   }, {
+      name: subModName.NUEVO_OFICIO,
+      component: NuevoOficioSubMod
    }, {
       name: subModName.BUSCAR_OPERATIVO,
       component: BuscarOperativoSubMod
