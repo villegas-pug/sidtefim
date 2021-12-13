@@ -26,8 +26,12 @@ import {
    Home,
    AddCircle,
    FindInPage,
-   TrendingUp
-} from '@material-ui/icons'
+   TrendingUp,
+   Flag,
+   CardMembership,
+   Man,
+   Woman
+} from '@mui/icons-material'
 
 const classes = {
    subModIcon: {
@@ -47,6 +51,10 @@ export const Icons = {
    SortArrow: ArrowUpward,
    ThirdStateCheck: Remove,
    ViewColumn: ViewColumn,
+   Ceremonies: <CardMembership fontSize='large' />,
+   Nationalized: <Flag fontSize='large'/>,
+   Man: <Man fontSize='large'/>,
+   Woman: <Woman fontSize='large' />,
 
    /*» MOD'S...  */
    Home: <Home fontSize='small' />,

@@ -22,6 +22,7 @@ import nacionalizacionReducer from 'redux/reducers/nacionalizacionReducer'
 import expedienteMininterReducer from './reducers/expedienteMininterReducer'
 import preInscripcionReducer from 'redux/reducers/preInscripcionReducer'
 import refugiadoReducer from 'redux/reducers/refugiadoReducer'
+import ceremoniaReducer from 'redux/reducers/ceremoniaReducer'
 
 /*» Manage status of the step's sub-module's...  */
 import stagesReducer from 'redux/reducers/stagesReducer'
@@ -47,7 +48,7 @@ const reducers = combineReducers({
    expedienteMininter: expedienteMininterReducer,
    preInscripcion: preInscripcionReducer,
    refugiado: refugiadoReducer,
-
+   ceremonia: ceremoniaReducer,
    stages: stagesReducer,
 })
 

@@ -118,7 +118,10 @@ export default function NuevoExpedienteMininterSubMod(){
                   arrow
                >
                   <IconButton
-                     onClick={() => handleEditRecordDetExpMininter(data)}
+                     onClick={() => {
+                        handleEditRecordDetExpMininter(data)
+                        console.log(data)
+                     }}
                   >
                      <Edit fontSize='small' />
                   </IconButton>

@@ -16,6 +16,7 @@ const NuevoInterpolSubMod = lazy(() => import('pages/submodulo/NuevoInterpolSubM
 const NuevaActividadSubMod = lazy(() => import('pages/submodulo/NuevaActividadSubMod'))
 const NuevoExpedienteMininterSubMod = lazy(() => import('pages/submodulo/NuevoExpedienteMininterSubMod'))
 const NuevoOficioSubMod = lazy(() => import('pages/submodulo/NuevoOficioSubMod'))
+const NuevaCeremoniaSubMod = lazy(() => import('pages/submodulo/NuevaCeremoniaSubMod'))
 const BuscarInterpolSubMod = lazy(() => import('pages/submodulo/BuscarInterpolSubMod'))  
 const BuscarOperativoSubMod = lazy(() => import('pages/submodulo/BuscarOperativoSubMod'))
 const BuscarPreInscripcionSubMod = lazy(() => import('pages/submodulo/BuscarPreInscripcionSubMod'))
@@ -74,6 +75,9 @@ const subModulo = [
    }, {
       name: subModName.NUEVO_OFICIO,
       component: NuevoOficioSubMod
+   }, {
+      name: subModName.NUEVA_CEREMONIA,
+      component: NuevaCeremoniaSubMod
    }, {
       name: subModName.BUSCAR_OPERATIVO,
       component: BuscarOperativoSubMod

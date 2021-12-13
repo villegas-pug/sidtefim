@@ -1,8 +1,8 @@
 import React from 'react'
 import { optEtapaProcNac } from 'constants/optEtapaProcNac'
-import _ from 'lodash'
 import { Steps } from 'antd'
 
+// eslint-disable-next-line react/prop-types
 export default function ProgressProcNac({ current }) {
    const { Step } = Steps
    return (

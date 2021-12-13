@@ -8,10 +8,9 @@ import {
 import SpeedDial from 'components/SpeedDial'
 import { Save, DeleteForever } from '@material-ui/icons'
 import * as Yup from 'yup'
-import _ from 'lodash'
 import MyTextField from 'components/Formik/MyTextField'
 import MyAutocomplete from 'components/Formik/Autocomplete'
-import { useSelector, useDispatch } from 'react-redux'
+import { useSelector } from 'react-redux'
 import MySelect from 'components/Formik/MySelect'
 
 const Container = styled.div`
@@ -40,7 +39,6 @@ const validationSchema = Yup.object({
 
 export default function Test() {
 
-   const dispatch = useDispatch()
    const rRegistrar = useRef()
    const rLimpiar = useRef()
 
@@ -64,7 +62,7 @@ export default function Test() {
       },
    ]
 
-   const handleSubmit = (values, meta) => {
+   const handleSubmit = (values) => {
       console.log(values)
       /* dispatch(registrarProcNac({ procNacionalizacion: values, usuario: usuario[0] })) */
    }
@@ -75,7 +73,7 @@ export default function Test() {
             initialValues={inputValuesProcNac}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
-            onReset={(values, meta) => {
+            onReset={(values) => {
                console.log(values)
             }}
          >
