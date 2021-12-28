@@ -3,6 +3,12 @@ import {
    DELETE_DET_EXP_MININTER_ERROR,
    DELETE_DET_EXP_MININTER_LOADING,
    DELETE_DET_EXP_MININTER_SUCCESS,
+   DOWNLOAD_FILE_ERROR,
+   DOWNLOAD_FILE_LOADING,
+   DOWNLOAD_FILE_SUCCESS,
+   FIND_ALL_RESUMEN_PLAZO_OFICIOS_ERROR,
+   FIND_ALL_RESUMEN_PLAZO_OFICIOS_LOADING,
+   FIND_ALL_RESUMEN_PLAZO_OFICIOS_SUCCESS,
    FIND_ALL_UBICACION_EXP_ERROR,
    FIND_ALL_UBICACION_EXP_LOADING,
    FIND_ALL_UBICACION_EXP_SUCCESS,
@@ -29,6 +35,7 @@ import { currentHttpStatus } from './httpStatusAction'
 import Noty from 'helpers/noty'
 import { httpStatus } from 'constants/httpStatus'
 import { MESSAGGE_WARNING_EMPTY } from 'constants/messages'
+import convertBlob from 'helpers/blob'
 
 const findByNumeroExpedienteLoading = () => ({ type: FIND_BY_NUMERO_EXPEDIENTE_LOADING })
 const findByNumeroExpedienteSuccess = (payload) => ({ type: FIND_BY_NUMERO_EXPEDIENTE_SUCCESS, payload })
@@ -55,12 +62,20 @@ const findByUbicacionLoading = () => ({ type: FIND_EXP_MININTER_BY_UBICACION_LOA
 const findByUbicacionSuccess = () => ({ type: FIND_EXP_MININTER_BY_UBICACION_SUCCESS })
 const findByUbicacionError = (payload) => ({ type: FIND_EXP_MININTER_BY_UBICACION_ERROR, payload })
 
+const findAllResumenPlazoOficiosLoading = () => ({ type: FIND_ALL_RESUMEN_PLAZO_OFICIOS_LOADING })
+const findAllResumenPlazoOficiosSuccess = (payload) => ({ type: FIND_ALL_RESUMEN_PLAZO_OFICIOS_SUCCESS, payload })
+const findAllResumenPlazoOficiosError = (payload) => ({ type: FIND_ALL_RESUMEN_PLAZO_OFICIOS_ERROR, payload })
+
+const downloadFileLoading = () => ({ type: DOWNLOAD_FILE_LOADING })
+const downloadFileSuccess = () => ({ type: DOWNLOAD_FILE_SUCCESS })
+const downloadFileError = (payload) => ({ type: DOWNLOAD_FILE_ERROR, payload })
+
 export const findByNumeroExpediente = (numeroTramite) => async (dispatch, getStore) => {
    dispatch(findByNumeroExpedienteLoading())
    try {
       const { usuario: { token } } = getStore()
       const { data: { levelLog, data, message } } = await api({
-         method: 'GET',
+         method: 'POST',
          url: `/microservicio-nacionalizacion/findByNumeroTramite/${numeroTramite}`,
          headers: {
             [AUTHORIZATION]: token
@@ -79,7 +94,36 @@ export const findByNumeroExpediente = (numeroTramite) => async (dispatch, getSto
          break
       }
    } catch (err) {
-      dispatch(currentHttpStatus(err.response.status))
+      dispatch(currentHttpStatus(err.response?.status))
+   }
+}
+
+export const findByNumeroExpedienteAndUsr = (numeroTramite) => async (dispatch, getStore) => {
+   dispatch(findByNumeroExpedienteLoading())
+   try {
+      const { usuario: { token, userCredentials } } = getStore()
+      const { data: { levelLog, data, message } } = await api({
+         method: 'POST',
+         url: `/microservicio-nacionalizacion/findByNumeroTramiteAndUsrDig/${numeroTramite}`,
+         data: userCredentials,
+         headers: {
+            [AUTHORIZATION]: token
+         }
+      })
+
+      switch (levelLog) {
+      case SUCCESS:
+         dispatch(findByNumeroExpedienteSuccess(data))
+         break
+      case WARNING:
+         dispatch(findByNumeroExpedienteWarning(message))
+         break
+      case ERROR:
+         dispatch(findByNumeroExpedienteError(message))
+         break
+      }
+   } catch (err) {
+      dispatch(currentHttpStatus(err.response?.status))
    }
 }
 
@@ -107,7 +151,7 @@ export const findAllUbicacionMininter = () => async (dispatch, getStore) => {
          break
       }
    } catch (err) {
-      dispatch(currentHttpStatus(err.response.status))
+      dispatch(currentHttpStatus(err.response?.status))
    }
 }
 
@@ -140,7 +184,80 @@ export const saveDetExpMininter = (detExpedienteMininter) => async (dispatch, ge
          break
       }
    } catch (err) {
-      dispatch(currentHttpStatus(err.response.status))
+      dispatch(currentHttpStatus(err.response?.status))
+   }
+}
+
+export const saveOficioInExpediente = (detExpedienteMininter) => async (dispatch, getStore) => {
+   dispatch(saveDetExpMininterLoading())
+   try {
+      const { 
+         usuario: { token, userCredentials: usuario }, 
+         expedienteMininter: { data: { nacionalizacion: { numeroTramite } } },
+      } = getStore()
+      const { data: { levelLog, data, message } } = await api({
+         method: 'POST',
+         url: `/microservicio-nacionalizacion/saveOficioInExpediente/${numeroTramite}`,
+         data: { detExpedienteMininter, usuario },
+         headers: {
+            [AUTHORIZATION]: token
+         }
+      })
+
+      switch (levelLog) {
+      case SUCCESS:
+         dispatch(saveDetExpMininterSuccess(data))
+         Noty(SUCCESS, message)
+         break
+      case WARNING:
+         dispatch(saveDetExpMininterError(message))
+         Noty(WARNING, message)
+         break
+      case ERROR:
+         dispatch(saveDetExpMininterError(message))
+         break
+      }
+   } catch (err) {
+      dispatch(currentHttpStatus(err.response?.status))
+   }
+}
+
+export const saveMailFileInOficio = (detExpedienteMininter, file) => async (dispatch, getStore) => {
+   dispatch(saveDetExpMininterLoading())
+   try {
+      const { 
+         usuario: { token }, 
+         expedienteMininter: { data: { nacionalizacion } },
+      } = getStore()
+
+      const frmData = new FormData()
+      frmData.append('entitiesDto', convertBlob({ detExpedienteMininter, nacionalizacion }))
+      frmData.append('file', file)
+
+      const { data: { levelLog, data, message } } = await api({
+         method: 'POST',
+         url: '/microservicio-nacionalizacion/saveMailFileInOficio',
+         data: frmData,
+         headers: {
+            [AUTHORIZATION]: token
+         }
+      })
+
+      switch (levelLog) {
+      case SUCCESS:
+         dispatch(saveDetExpMininterSuccess(data))
+         Noty(SUCCESS, message)
+         break
+      case WARNING:
+         dispatch(saveDetExpMininterError(message))
+         Noty(WARNING, message)
+         break
+      case ERROR:
+         dispatch(saveDetExpMininterError(message))
+         break
+      }
+   } catch (err) {
+      dispatch(currentHttpStatus(err.response?.status))
    }
 }
 
@@ -173,7 +290,7 @@ export const deleteDetExpMininter = (detExpedienteMininter) => async (dispatch, 
          break
       }
    } catch (err) {
-      dispatch(currentHttpStatus(err.response.status))
+      dispatch(currentHttpStatus(err.response?.status))
    }
 }
 
@@ -205,7 +322,7 @@ export const saveExpedienteMininter = () => async (dispatch, getStore) => {
          break
       }
    } catch (err) {
-      dispatch(currentHttpStatus(err.response.status))
+      dispatch(currentHttpStatus(err.response?.status))
    }
 }
 
@@ -236,6 +353,96 @@ export const findByUbicacion = (ubicacion) => async (dispatch, getStore) => {
          Noty(WARNING, MESSAGGE_WARNING_EMPTY)
       }
    } catch (err) {
-      dispatch(currentHttpStatus(err.response.status))
+      dispatch(currentHttpStatus(err.response?.status))
+   }
+}
+
+export const findAllResumenPlazoOficios = () => async (dispatch, getStore) => {
+   dispatch(findAllResumenPlazoOficiosLoading())   
+   try {
+      const { usuario: { token, userCredentials } } = getStore()
+      const { data: { levelLog, data, message } } = await api({
+         method: 'POST',
+         url: '/microservicio-nacionalizacion/**',
+         data: userCredentials,
+         headers: {
+            [AUTHORIZATION]: token
+         }
+      })
+
+      switch (levelLog) {
+      case SUCCESS:
+         dispatch(findAllResumenPlazoOficiosSuccess(data))            
+         break
+      case WARNING:
+         dispatch(findAllResumenPlazoOficiosError(message))
+         Noty(WARNING, message)
+         break
+      case ERROR:
+         dispatch(findAllResumenPlazoOficiosError(message))
+         break
+      }
+   } catch (err) {
+      dispatch(currentHttpStatus(err.response?.status))
+   }
+
+}
+
+export const downloadFileResumenPlazoOficios = (estadoPlazo) => async (dispatch, getStore) => {
+   dispatch(downloadFileLoading())
+   try {
+      const { usuario: { token, userCredentials } } = getStore()
+      const { data, status, headers, statusText } = await api({
+         method: 'POST',
+         url: `/microservicio-nacionalizacion/**/${estadoPlazo}`,
+         data: userCredentials,
+         headers: {
+            [AUTHORIZATION]: token
+         },
+         responseType: 'blob'
+      })
+
+      const fileName = headers['content-disposition'].split('=')[1].replaceAll('"', '')
+
+      switch (status) {
+      case httpStatus.OK:
+         dispatch(downloadFileSuccess())
+         fileDownload(data, fileName)
+         break
+      case httpStatus.NO_CONTENT:
+         dispatch(downloadFileError(statusText))
+         break
+      }
+   } catch (err) {
+      dispatch(currentHttpStatus(err.response?.status))
+   }
+}
+
+export const downloadMailFile = (idMail) => async (dispatch, getStore) => {
+   dispatch(downloadFileLoading())
+   try {
+      const { usuario: { token } } = getStore()
+      const { data, status, headers, statusText } = await api({
+         method: 'GET',
+         url: `/microservicio-nacionalizacion/**/${idMail}`,
+         headers: {
+            [AUTHORIZATION]: token
+         },
+         responseType: 'blob'
+      })
+
+      const fileName = headers['content-disposition'].split('=')[1].replaceAll('"', '')
+
+      switch (status) {
+      case httpStatus.OK:
+         dispatch(downloadFileSuccess())
+         fileDownload(data, fileName)
+         break
+      case httpStatus.NO_CONTENT:
+         dispatch(downloadFileError(statusText))
+         break
+      }
+   } catch (err) {
+      dispatch(currentHttpStatus(err.response?.status))
    }
 }

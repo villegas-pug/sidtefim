@@ -2,6 +2,12 @@ import {
    DELETE_DET_EXP_MININTER_ERROR,
    DELETE_DET_EXP_MININTER_LOADING,
    DELETE_DET_EXP_MININTER_SUCCESS,
+   DOWNLOAD_FILE_ERROR,
+   DOWNLOAD_FILE_LOADING,
+   DOWNLOAD_FILE_SUCCESS,
+   FIND_ALL_RESUMEN_PLAZO_OFICIOS_ERROR,
+   FIND_ALL_RESUMEN_PLAZO_OFICIOS_LOADING,
+   FIND_ALL_RESUMEN_PLAZO_OFICIOS_SUCCESS,
    FIND_ALL_UBICACION_EXP_ERROR,
    FIND_ALL_UBICACION_EXP_LOADING,
    FIND_ALL_UBICACION_EXP_SUCCESS,
@@ -28,6 +34,15 @@ const initialState = {
    ubicacionMininter:{
       loading: false,
       data: [],
+      error: null
+   },
+   resumenPlazoOficios: {
+      loading: false,
+      data: [],
+      error: null
+   },
+   fileDownload: {
+      loading: false,
       error: null
    }
 }
@@ -69,6 +84,18 @@ export default function expedienteMininterReducer(state = initialState, { type, 
       return { ...state, loading: false, error: null }
    case FIND_EXP_MININTER_BY_UBICACION_ERROR:
       return { ...state, loading: false, error: payload }
+   case FIND_ALL_RESUMEN_PLAZO_OFICIOS_LOADING:
+      return { ...state, resumenPlazoOficios: { loading: true, data: {}, error: null} }
+   case FIND_ALL_RESUMEN_PLAZO_OFICIOS_SUCCESS:
+      return { ...state, resumenPlazoOficios: { loading: false, data: payload[0], error: null} }
+   case FIND_ALL_RESUMEN_PLAZO_OFICIOS_ERROR:
+      return { ...state, resumenPlazoOficios: { loading: false, data: {}, error: payload} }
+   case DOWNLOAD_FILE_LOADING:
+      return { ...state, fileDownload: { loading: true, error: null } }
+   case DOWNLOAD_FILE_SUCCESS:
+      return { ...state, fileDownload: { loading: false, error: null } }
+   case DOWNLOAD_FILE_ERROR:
+      return { ...state, fileDownload: { loading: false, error: payload } }
    default:
       return state
    }

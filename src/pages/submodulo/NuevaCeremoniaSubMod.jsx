@@ -91,7 +91,6 @@ export default function NuevaCeremoniaSubMod(){
                         }
                      </Box>
                   </Fade>
-                     
                </Grid>
                <Grid item xs={12}><Divider /></Grid>
                <Grid item xs={12}>

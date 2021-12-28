@@ -10,8 +10,9 @@ import {
    Paper,
    Button,
    IconButton,
-   Tooltip, Typography
-} from '@material-ui/core'
+   Tooltip, 
+   Typography
+} from '@material-ui/core/'
 import { makeStyles } from '@material-ui/core/styles'
 import { 
    Search,
@@ -19,23 +20,25 @@ import {
    Save,
    Add,
    DeleteForever,
-   Cancel
-} from '@material-ui/icons'
+   Cancel,
+   Book,
+   Mail
+} from '@mui/icons-material'
 import Fade from 'react-reveal/Fade'
 import { Formik, Form } from 'formik'
 import * as Yup from 'yup'
+import { differenceInBusinessDays } from 'date-fns'
 
 import Table from 'components/Table'
 import SimpleModal from 'components/SimpleModal'
 import MyAutocomplete from 'components/Formik/Autocomplete'
 import MyTextField from 'components/Formik/MyTextField'
+import InfoCardDownload from 'components/InfoCardDownload'
 
 import useExpedienteMininter from 'hooks/useExpedienteMininter'
+import AddFilePool from 'components/AddFilePool'
 
 const useStyle = makeStyles({
-   formControl: {
-      /* marginBottom: 10 */
-   },
    paper:{
       marginBottom: 5
    }
@@ -47,28 +50,32 @@ const commonProps = {
    disabled: true
 }
 
+const PENDIENTE = 'PENDIENTE'
+
 export default function NuevoExpedienteMininterSubMod(){
 
    /*» HOOK'S  */
    const refNumeroTramite = useRef('')
    const refRecordDetExpMininter = useRef({})
+   const refFilePoolData = useRef({})
    const [openModalAddTrace, setOpenModalAddTrace] = useState(false)
    const [openModalRemoveTrace, setOpenModalRemoveTrace] = useState(false)
+   const [openModalAddMail, setOpenModalAddMail] = useState(false)
 
    /*» CUSTOM HOOK'S  */
    const classes = useStyle()
    const { 
       mininterDbLoading,
       nacionalizacionDb,
-      expedienteMininterDb,
       detExpedienteMininterDb,
       mininterDbWarning,
       isNewToMiniter,
       isOldToMininter,
-      handleFindByNumeroExpediente,
+      handleFindByNumeroExpedienteAndUsr,
       handleFindAllUbicacionMininter,
       handleDeleteDetExpeMininter,
-      handleSaveExpedienteMininter
+      handleSaveExpedienteMininter,
+      handleAddMailToOficio
    } = useExpedienteMininter()
 
    /*»EFFECT'S  */
@@ -94,22 +101,45 @@ export default function NuevoExpedienteMininterSubMod(){
       setOpenModalRemoveTrace(false)
    }
 
+   const handleDownloadToInfoCard = () => {
+      console.log('Descargar reporte de oficios dentro y fuera de plazo!!!')
+   }
+
+   const handleOpenAddFilePool = (record) => {
+      refFilePoolData.current = record
+      setOpenModalAddMail(true)
+   }
+
    /*» DEP'S  */
    /*» ARGUMENT ◄► `dataTable`  */
    const dataTable = useMemo(() => ({
       columns: [
-         { title: 'Nro.Oficio', field: 'numeroOficio', width: 10 },
-         { title: 'Fec.Oficio', field: 'fechaOficio', type: 'date', width: 10 },
-         { title: 'Fec.Recepción', field: 'fechaRecepcion', type: 'date', width: 10 },
-         { title: 'Acciones Realizadas', field: 'accionesRealizadas', width: 400 },
-         { title: 'Ubicación', width: 150, render: ({ ubicacion: { descripcion } }) => descripcion },
+         { title: 'Nro.Ofi. M.P', field: 'numeroOficio', width: 20 },
+         { title: 'Fec.Ofi. M.P', field: 'fechaOficio', type: 'date', width: 20 },
+         { title: 'Fec.Acuse', field: 'fechaRecepcion', type: 'date', width: 10 },
+         { title: 'Fec.Respuesta', field: 'fechaRespuesta', type: 'date', width: 10 },
+         { title: 'Fec.Vencimiento', field: 'fechaVencimiento', type: 'date', width: 10 },
+         { 
+            title: 'Dias.Venc.', 
+            width: 10, 
+            render: ({ fechaOficio, fechaRecepcion, fechaVencimiento, estado }) => {
+               if(estado === PENDIENTE){
+                  if(fechaRecepcion)
+                     return differenceInBusinessDays(new Date(fechaVencimiento), new Date(fechaRecepcion))
+                  else
+                     return differenceInBusinessDays(new Date(fechaVencimiento), new Date(fechaOficio))
+               }
+            } },
+         { title: 'Estado', field: 'estado', width: 10 },
+         { title: 'Asunto', field: 'accionesRealizadas', width: 290 },
+         { title: 'Destinatario', width: 90, render: ({ ubicacion: { descripcion } }) => descripcion },
       ],
       data: detExpedienteMininterDb
    }), [detExpedienteMininterDb])
-   
+
    /*» ARGUMENT ◄► `dataTable`  */
    const configTable = useMemo(() => ({
-      actions: [{ icon: 'Editar' }, { icon: 'Eliminar' }],
+      actions: [{ icon: 'Editar' }, { icon: 'Eliminar' }, { icon: 'Correos' }],
       components: ({ action: { icon }, data }) => {
          if (icon === 'Editar')
             return (
@@ -138,11 +168,45 @@ export default function NuevoExpedienteMininterSubMod(){
                      <DeleteForever fontSize='small' />
                   </IconButton>
                </Tooltip>)
+         else if(icon === 'Correos')
+            return(
+               <Tooltip
+                  title='Anexos'
+                  arrow
+               >
+                  <IconButton
+                     onClick={() => handleOpenAddFilePool(data)}
+                  >
+                     <Mail fontSize='small' />
+                  </IconButton>
+               </Tooltip>)
       }
    }), [])
 
    return (
       <>
+         {/*» `INFO-CARD'S` */}
+         <Box height={85} display='flex' justifyContent='space-around' alignItems='center'>
+            <InfoCardDownload 
+               icon={Book}
+               title='Dentro plazo'
+               value={20}
+               handleDownload={handleDownloadToInfoCard} 
+            />
+            <InfoCardDownload 
+               icon={Book}
+               title='Por vencer'
+               value={10}
+               handleDownload={handleDownloadToInfoCard} 
+            />
+            <InfoCardDownload 
+               icon={Book}
+               title='Fuera plazo'
+               value={5}
+               handleDownload={handleDownloadToInfoCard} 
+            />
+         </Box>
+
          {/*» `SEARCH`  */}
          <Fade>
             <Box display='flex' height={80} mx={2} alignItems='center' justifyContent='space-between'>
@@ -154,7 +218,7 @@ export default function NuevoExpedienteMininterSubMod(){
                   </FormControl>
                   <Button 
                      variant='contained' 
-                     onClick={() => handleFindByNumeroExpediente(refNumeroTramite.current)}
+                     onClick={() => handleFindByNumeroExpedienteAndUsr(refNumeroTramite.current)}
                   >
                      <Search color='inherit' />
                   </Button>
@@ -165,7 +229,7 @@ export default function NuevoExpedienteMininterSubMod(){
                         variant='contained'
                         color='primary'
                         startIcon={<Save fontSize='small' />}
-                        onClick={handleSaveExpedienteMininter}
+                        onClick={ handleSaveExpedienteMininter }
                      >
                         <Typography variant='h4' color='initial'>Nuevo</Typography>
                      </Button> 
@@ -181,6 +245,7 @@ export default function NuevoExpedienteMininterSubMod(){
                </Box>
             </Box>
          </Fade>
+         
          {/*» RESULT: `HEAD`  */}
          <Fade>
             <Paper variant='outlined' className={classes.paper}>
@@ -189,10 +254,10 @@ export default function NuevoExpedienteMininterSubMod(){
                   <TextField value={nacionalizacionDb?.tipoTramite || ''} label='Tipo trámite' style={{ width: 410 }} {...commonProps}/>
                   <TextField value={nacionalizacionDb?.administrado || ''} label='Administrado' style={{ width: 250 }} {...commonProps}/>
                   <TextField value={nacionalizacionDb?.dependencia || ''} label='Dependencia' style={{ width: 90 }} {...commonProps} />
-                  <TextField value={expedienteMininterDb?.ubicacion?.descripcion || ''} label='Ubicación actual expediente' style={{ width: 200 }} {...commonProps}/>
                </Box>
             </Paper>
          </Fade>
+
          {/*» RESULT: `BODY`  */}
          {
             <Box overflow='hidden'>
@@ -237,6 +302,15 @@ export default function NuevoExpedienteMininterSubMod(){
                </Box>
             </Box>
          </SimpleModal>
+
+         <SimpleModal open={openModalAddMail} setOpen={setOpenModalAddMail}>
+            <AddFilePool 
+               data={refFilePoolData.current} 
+               handleAddMail={handleAddMailToOficio} 
+               /* handleDowloadMail={handleDowloadMail} 
+               handleDeleteMail={handleDeleteMail}  */
+            />
+         </SimpleModal>
       </>
    )
 }
@@ -245,28 +319,25 @@ export default function NuevoExpedienteMininterSubMod(){
 function FormToAddTrace({ handleModalAddTrace, recordDetExpMininter }){
 
    /*» CUSTOM HOOK'S  */
-   const { ubicacionMininterDb, handleSaveDetExpeMininter } = useExpedienteMininter()
+   const { ubicacionMininterDb, handleSaveOficioInExpediente } = useExpedienteMininter()
 
    /*»EFFECT'S  */
 
    /*» DEP'S  */
    const optForm = useMemo(() => ({
-      initialValues: {
-         idDetExpMininter: recordDetExpMininter.idDetExpMininter,
-         numeroOficio: recordDetExpMininter.numeroOficio,
-         fechaOficio: recordDetExpMininter.fechaOficio,
-         fechaRecepcion: recordDetExpMininter.fechaRecepcion,
-         ubicacion: recordDetExpMininter.ubicacion,
-         accionesRealizadas: recordDetExpMininter.accionesRealizadas,
+      initialValues: { 
+         numeroOficio: '',
+         fechaOficio: '',
+         ubicacion: '',
+         ...recordDetExpMininter
       },
       validationSchema: Yup.object({
-         /* numeroOficio: Yup.string().required('¡Campo requerido!'),
-         fechaOficio: Yup.date().required('¡Campo requerido!'),*/
-         fechaRecepcion: Yup.date().required('¡Campo requerido!'),
+         numeroOficio: Yup.string().required('¡Campo requerido!'),
+         fechaOficio: Yup.date().required('¡Campo requerido!'),
          ubicacion: Yup.object().required('¡Campo requerido!'),
       }),
       onSubmit: (values, { resetForm }) => {
-         handleSaveDetExpeMininter(values)
+         handleSaveOficioInExpediente(values)
          resetForm()
          handleModalAddTrace(false)
       }
@@ -281,11 +352,12 @@ function FormToAddTrace({ handleModalAddTrace, recordDetExpMininter }){
                ({...rest}) => (
                   <Form>
                      <Box display='flex' minHeight={70} width={1300} flexWrap='wrap' justifyContent='space-between'>
-                        <MyTextField name='numeroOficio' label='Número oficio' size={10} focused />
-                        <MyTextField type='date' name='fechaOficio' label='Fecha oficio' size={10} />
-                        <MyTextField type='date' name='fechaRecepcion' label='Fecha recepción' size={10} />
-                        <MyAutocomplete name='ubicacion' label='Destino' width={17} opt={ubicacionMininterDb} {...rest} />
-                        <MyTextField name='accionesRealizadas' label='Acciones realizadas' size={25} />
+                        <MyTextField name='numeroOficio' label='Núm.Ofi. Mesa Partes' size={10} focused />
+                        <MyTextField type='date' name='fechaOficio' label='Fec.Ofi. Mesa Partes' size={10} />
+                        <MyTextField type='date' name='fechaRecepcion' label='Fecha acuse' size={10} />
+                        <MyTextField type='date' name='fechaRespuesta' label='Fecha respuesta' size={10} />
+                        <MyAutocomplete name='ubicacion' label='Destinatario' width={15} opt={ubicacionMininterDb} {...rest} />
+                        <MyTextField name='accionesRealizadas' label='Asunto' size={20} />
                      </Box>
                      <Box display='flex' gridGap={5}>
                         <Button
