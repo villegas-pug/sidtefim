@@ -5,23 +5,34 @@ import {
    Box,
    IconButton,
    Typography,
-   Paper
+   Paper,
+   CircularProgress
 } from '@mui/material'
 import { 
    Add, 
    Mail,
-   Delete,
-   DownloadDone
+   RemoveCircleOutline,
+   Visibility,
 } from '@mui/icons-material'
+import useExpedienteMininter from 'hooks/useExpedienteMininter'
 
+export default function AddFilePool({ record, handleAddMail, handleDowloadMail, handleDeleteMail }){
 
-export default function AddFilePool({ data, handleAddMail, handleDowloadMail, handleDeleteMail }){
+   /*» DEP'S  */
+   const { idDetExpMininter } = record
 
    /*» HOOK'S  */
    const refFile = useRef([])
 
+   /*» CUSTOM-HOOK'S  */
+   const { 
+      getMailFilesDb, 
+      mininterDbLoading, 
+      fileDownloadLoading
+   } = useExpedienteMininter()
+
    /*» HANDLER'S  */
-   const handleChangeFile = ({ target: { files } }) => { handleAddMail(data, files[0])}
+   const handleChangeFileDialog = ({ target: { files } }) => { handleAddMail(record, files[0])}
    const handleOpenFileDialog = () => { refFile.current.click() }
 
    return (
@@ -35,7 +46,7 @@ export default function AddFilePool({ data, handleAddMail, handleDowloadMail, ha
          >
             {/*» Action: Show file ... */}
             {
-               data?.mailFiles.map(({ idMailFile, descripcion }) => (
+               getMailFilesDb(idDetExpMininter).map(({ idMailFile, descripcion }) => (
                   <Box key={idMailFile} display='flex' minWidth={100} height={100} justifyContent='center' alignItems='center' flexGrow={1}>
                      <Paper variant='outlined'>
                         <Grid container>
@@ -49,14 +60,16 @@ export default function AddFilePool({ data, handleAddMail, handleDowloadMail, ha
                               <IconButton
                                  onClick={() => handleDeleteMail(idMailFile)}
                               >
-                                 <DownloadDone fontSize='small' />
+                                 <RemoveCircleOutline fontSize='small' />
                               </IconButton>
                            </Grid>
                            <Grid item container xs={6} justifyContent='center' alignItems='center'>
                               <IconButton
                                  onClick={() => handleDowloadMail(idMailFile)}
+                                 disabled={fileDownloadLoading}
                               >
-                                 <Delete fontSize='small' />
+                                 { fileDownloadLoading ? <CircularProgress size={20} color='inherit' /> : <Visibility fontSize='small' />}
+                                 
                               </IconButton>
                            </Grid>
                         </Grid>
@@ -70,17 +83,18 @@ export default function AddFilePool({ data, handleAddMail, handleDowloadMail, ha
                <Box display='flex' flexDirection='column' justifyContent='center' alignItems='center'>
                   <IconButton
                      onClick={handleOpenFileDialog}
+                     disabled={mininterDbLoading}
                   >
-                     <Add color='primary' fontSize='large' />
+                     <Add color={mininterDbLoading ? 'disabled' : 'primary'} fontSize='large' />
                   </IconButton>
                   <Typography variant='subtitle2' color='inherit'>Adjuntar correos</Typography>
                   <input 
                      ref={refFile} 
                      type='file' 
                      name='file' 
-                     accept='*.msj' 
+                     accept='.msg, *' 
                      hidden 
-                     onChange={handleChangeFile}
+                     onChange={handleChangeFileDialog}
                   />
                </Box>
             </Box>
@@ -92,7 +106,7 @@ export default function AddFilePool({ data, handleAddMail, handleDowloadMail, ha
 
 
 AddFilePool.propTypes = {
-   data: PropTypes.object.isRequired, 
+   record: PropTypes.object.isRequired, 
    handleDowloadMail: PropTypes.func.isRequired, 
    handleDeleteMail: PropTypes.func.isRequired, 
    handleAddMail: PropTypes.func.isRequired

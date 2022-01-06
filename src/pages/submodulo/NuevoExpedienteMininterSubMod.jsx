@@ -29,6 +29,7 @@ import Table from 'components/Table'
 import SimpleModal from 'components/SimpleModal'
 import MyAutocomplete from 'components/Formik/Autocomplete'
 import MyTextField from 'components/Formik/MyTextField'
+import ModalLoader from 'components/Styled/ModalLoader'
 
 import useExpedienteMininter from 'hooks/useExpedienteMininter'
 
@@ -65,7 +66,7 @@ export default function NuevoExpedienteMininterSubMod(){
       mininterDbWarning,
       isNewToMiniter,
       isOldToMininter,
-      handleFindByNumeroExpediente,
+      handleFindByNumeroExpedienteAndUsr,
       handleFindAllUbicacionMininter,
       handleDeleteDetExpeMininter,
       handleSaveExpedienteMininter
@@ -151,7 +152,7 @@ export default function NuevoExpedienteMininterSubMod(){
                   </FormControl>
                   <Button 
                      variant='contained' 
-                     onClick={() => handleFindByNumeroExpediente(refNumeroTramite.current)}
+                     onClick={() => handleFindByNumeroExpedienteAndUsr(refNumeroTramite.current)}
                   >
                      <Search color='inherit' />
                   </Button>
@@ -234,6 +235,9 @@ export default function NuevoExpedienteMininterSubMod(){
                </Box>
             </Box>
          </SimpleModal>
+
+         {/*» MODAL-LOADING  */}
+         { mininterDbLoading && <ModalLoader /> }
       </>
    )
 }

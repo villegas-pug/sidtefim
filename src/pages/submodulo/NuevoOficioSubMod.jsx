@@ -11,8 +11,10 @@ import {
    Button,
    IconButton,
    Tooltip, 
-   Typography
-} from '@material-ui/core/'
+   Typography,
+   Switch,
+   FormControlLabel
+} from '@material-ui/core'
 import { makeStyles } from '@material-ui/core/styles'
 import { 
    Search,
@@ -21,10 +23,13 @@ import {
    Add,
    DeleteForever,
    Cancel,
-   Book,
-   Mail
+   Mail,
+   HistoryToggleOff,
+   AvTimer,
+   HourglassDisabled
 } from '@mui/icons-material'
 import Fade from 'react-reveal/Fade'
+import Flash from 'react-reveal/Flash'
 import { Formik, Form } from 'formik'
 import * as Yup from 'yup'
 import { differenceInBusinessDays } from 'date-fns'
@@ -34,6 +39,7 @@ import SimpleModal from 'components/SimpleModal'
 import MyAutocomplete from 'components/Formik/Autocomplete'
 import MyTextField from 'components/Formik/MyTextField'
 import InfoCardDownload from 'components/InfoCardDownload'
+import ModalLoader from 'components/Styled/ModalLoader'
 
 import useExpedienteMininter from 'hooks/useExpedienteMininter'
 import AddFilePool from 'components/AddFilePool'
@@ -51,37 +57,65 @@ const commonProps = {
 }
 
 const PENDIENTE = 'PENDIENTE'
+const NUMERO_OFICIO_LABEL = 'Número Oficio'
+const NUMERO_EXPEDIENTE_LABEL = 'Número Expediente'
+const NUMERO_OFICIO_KEY = 0
+const NUMERO_EXPEDIENTE_KEY = 1
+
+const NUEVO_KEY = 1
+const BUSCAR_KEY = 0
 
 export default function NuevoExpedienteMininterSubMod(){
 
    /*» HOOK'S  */
    const refNumeroTramite = useRef('')
    const refRecordDetExpMininter = useRef({})
-   const refFilePoolData = useRef({})
    const [openModalAddTrace, setOpenModalAddTrace] = useState(false)
    const [openModalRemoveTrace, setOpenModalRemoveTrace] = useState(false)
    const [openModalAddMail, setOpenModalAddMail] = useState(false)
+   const [filterType, setFilterType] = useState(NUMERO_EXPEDIENTE_KEY)
+   const [actionType, setActionType] = useState(NUEVO_KEY)
 
    /*» CUSTOM HOOK'S  */
    const classes = useStyle()
-   const { 
+   const {
       mininterDbLoading,
       nacionalizacionDb,
       detExpedienteMininterDb,
       mininterDbWarning,
+      resumenPlazoOficiosDb,
+      fileDownloadLoading,
+      resumenPlazoOficiosLoadingDb,
       isNewToMiniter,
       isOldToMininter,
       handleFindByNumeroExpedienteAndUsr,
       handleFindAllUbicacionMininter,
       handleDeleteDetExpeMininter,
       handleSaveExpedienteMininter,
-      handleAddMailToOficio
+      handleAddMailToOficio,
+      handleDeleteMail,
+      handleDownloadMail,
+      handleDownloadFileResumenPlazoOficios,
+      handleFindAllResumenPlazoOficios
    } = useExpedienteMininter()
 
    /*»EFFECT'S  */
+   useEffect(() => { handleFindAllResumenPlazoOficios() }, [])
    useEffect(() => { handleFindAllUbicacionMininter() }, [])
-   useEffect(() => { if(!openModalAddTrace) refRecordDetExpMininter.current = {} }, [openModalAddTrace])
-   useEffect(() => { if(!openModalRemoveTrace) refRecordDetExpMininter.current = {} }, [openModalRemoveTrace])
+   useEffect(() => { /*» EXEC EFFECT, WHEN CLOSE SAVE&EDIT-MODAL ... */
+      if(!openModalAddTrace) {
+         refRecordDetExpMininter.current = {} 
+         handleFindAllResumenPlazoOficios()
+      }
+   }, [openModalAddTrace])
+
+   useEffect(() => { 
+      if(!openModalRemoveTrace) {
+         refRecordDetExpMininter.current = {}
+         handleFindAllResumenPlazoOficios()
+      }
+   }, [openModalRemoveTrace])
+   useEffect(() => { if(!openModalAddMail) refRecordDetExpMininter.current = {} }, [openModalAddMail])
 
    /*» HANDLER'S  */
    const handleChangeNumeroTramite = ({target: { value }}) => refNumeroTramite.current = value
@@ -101,13 +135,19 @@ export default function NuevoExpedienteMininterSubMod(){
       setOpenModalRemoveTrace(false)
    }
 
-   const handleDownloadToInfoCard = () => {
-      console.log('Descargar reporte de oficios dentro y fuera de plazo!!!')
+   const handleOpenAddFilePool = (record) => {
+      refRecordDetExpMininter.current = record
+      setOpenModalAddMail(true)
    }
 
-   const handleOpenAddFilePool = (record) => {
-      refFilePoolData.current = record
-      setOpenModalAddMail(true)
+   const handleChangeFilterType = ({ target: { checked } }) => { 
+      if(checked) setFilterType(NUMERO_EXPEDIENTE_KEY)
+      else setFilterType(NUMERO_OFICIO_KEY)
+   }
+
+   const handleChangeActionType = ({ target: { checked } }) => { 
+      if(checked) setActionType(NUEVO_KEY)
+      else setActionType(BUSCAR_KEY)
    }
 
    /*» DEP'S  */
@@ -124,10 +164,8 @@ export default function NuevoExpedienteMininterSubMod(){
             width: 10, 
             render: ({ fechaOficio, fechaRecepcion, fechaVencimiento, estado }) => {
                if(estado === PENDIENTE){
-                  if(fechaRecepcion)
-                     return differenceInBusinessDays(new Date(fechaVencimiento), new Date(fechaRecepcion))
-                  else
-                     return differenceInBusinessDays(new Date(fechaVencimiento), new Date(fechaOficio))
+                  if(fechaRecepcion) return differenceInBusinessDays(new Date(fechaVencimiento), new Date(fechaRecepcion))
+                  else return differenceInBusinessDays(new Date(fechaVencimiento), new Date(fechaOficio))
                }
             } },
          { title: 'Estado', field: 'estado', width: 10 },
@@ -139,12 +177,12 @@ export default function NuevoExpedienteMininterSubMod(){
 
    /*» ARGUMENT ◄► `dataTable`  */
    const configTable = useMemo(() => ({
-      actions: [{ icon: 'Editar' }, { icon: 'Eliminar' }, { icon: 'Correos' }],
+      actions: [{ icon: 'Actualizar' }, { icon: 'Correos' }],
       components: ({ action: { icon }, data }) => {
-         if (icon === 'Editar')
+         if (icon === 'Actualizar')
             return (
                <Tooltip
-                  title='Editar'
+                  title='Actualizar'
                   arrow
                >
                   <IconButton
@@ -186,77 +224,134 @@ export default function NuevoExpedienteMininterSubMod(){
    return (
       <>
          {/*» `INFO-CARD'S` */}
-         <Box height={85} display='flex' justifyContent='space-around' alignItems='center'>
-            <InfoCardDownload 
-               icon={Book}
-               title='Dentro plazo'
-               value={20}
-               handleDownload={handleDownloadToInfoCard} 
-            />
-            <InfoCardDownload 
-               icon={Book}
-               title='Por vencer'
-               value={10}
-               handleDownload={handleDownloadToInfoCard} 
-            />
-            <InfoCardDownload 
-               icon={Book}
-               title='Fuera plazo'
-               value={5}
-               handleDownload={handleDownloadToInfoCard} 
-            />
-         </Box>
-
-         {/*» `SEARCH`  */}
-         <Fade>
-            <Box display='flex' height={80} mx={2} alignItems='center' justifyContent='space-between'>
-               <Box display='flex' width={220} alignItems='center' gridGap={10}>
-                  <FormControl className={classes.formControl} error={!!mininterDbWarning}>
-                     <InputLabel>Número expediente</InputLabel>
-                     <Input autoFocus onChange={handleChangeNumeroTramite} />
-                     <FormHelperText>{mininterDbWarning}</FormHelperText>
-                  </FormControl>
-                  <Button 
-                     variant='contained' 
-                     onClick={() => handleFindByNumeroExpedienteAndUsr(refNumeroTramite.current)}
-                  >
-                     <Search color='inherit' />
-                  </Button>
-               </Box>
-               <Box display='flex' alignItems='center' >
-                  <Fade right collapse when={isNewToMiniter}>
-                     <Button 
-                        variant='contained'
-                        color='primary'
-                        startIcon={<Save fontSize='small' />}
-                        onClick={ handleSaveExpedienteMininter }
-                     >
-                        <Typography variant='h4' color='initial'>Nuevo</Typography>
-                     </Button> 
-                  </Fade>
-                  <Fade right collapse when={isOldToMininter}>
-                     <IconButton 
-                        color='primary'
-                        onClick={() => handleModalAddTrace(true)}
-                     >
-                        <Add fontSize='large' />
-                     </IconButton>
-                  </Fade>
-               </Box>
+         <Flash when={!resumenPlazoOficiosLoadingDb}>
+            <Box height={85} display='flex' justifyContent='space-around' alignItems='center'>
+               <InfoCardDownload 
+                  icon={HistoryToggleOff}
+                  title='Dentro plazo'
+                  isLoading={ fileDownloadLoading }
+                  value={resumenPlazoOficiosDb['dentroPlazoVenc']}
+                  handleDownload={ () => handleDownloadFileResumenPlazoOficios(1) } 
+               />
+               <InfoCardDownload 
+                  icon={AvTimer}
+                  title='Por vencer plazo'
+                  isLoading={ fileDownloadLoading }
+                  value={resumenPlazoOficiosDb['proximoPlazoVenc']}
+                  handleDownload={ () => handleDownloadFileResumenPlazoOficios(0) } 
+               />
+               <InfoCardDownload 
+                  icon={HourglassDisabled}
+                  title='Fuera plazo'
+                  isLoading={ fileDownloadLoading }
+                  value={resumenPlazoOficiosDb['fueraPlazoVenc']}
+                  handleDownload={ () => handleDownloadFileResumenPlazoOficios(-1) } 
+               />
             </Box>
-         </Fade>
+         </Flash>
+
+         {/*» `ACTION'S`  */}
+         <>
+            <Box display='flex' pl={2} height={60}>
+               <FormControlLabel 
+                  control={<Switch size='small' color='primary' defaultChecked onChange={handleChangeActionType}  />} 
+                  label={ actionType === NUEVO_KEY ? 'Buscar' : 'Nuevo' } 
+               />
+            </Box>
+            {
+               actionType === NUEVO_KEY
+                  ?(/*» NUEVO ... */
+                     <Flash>
+                        <Box display='flex' height={80} mx={2} alignItems='center' justifyContent='space-between'>
+
+                           <Box display='flex' width={250} alignItems='center' gridGap={10}>
+                              <Box display='flex' flexDirection='column' alignItems='center'>
+                                 <FormControl className={classes.formControl} error={!!mininterDbWarning}>
+                                    <InputLabel>{ NUMERO_EXPEDIENTE_LABEL }</InputLabel>
+                                    <Input autoFocus onChange={handleChangeNumeroTramite} />
+                                    <FormHelperText>{mininterDbWarning}</FormHelperText>
+                                 </FormControl>
+                              </Box>
+                              <Button 
+                                 variant='contained' 
+                                 onClick={() => handleFindByNumeroExpedienteAndUsr(refNumeroTramite.current)}
+                              >
+                                 <Search color='inherit' />
+                              </Button>
+                           </Box>
+
+                           <Box display='flex' alignItems='center' >
+                              <Fade right collapse when={isNewToMiniter}>
+                                 <Button 
+                                    variant='contained'
+                                    color='primary'
+                                    startIcon={<Save fontSize='small' />}
+                                    onClick={ handleSaveExpedienteMininter }
+                                 >
+                                    <Typography variant='h4' color='initial'>Nuevo</Typography>
+                                 </Button> 
+                              </Fade>
+                              <Fade right collapse when={isOldToMininter}>
+                                 <IconButton 
+                                    color='primary'
+                                    onClick={() => handleModalAddTrace(true)}
+                                 >
+                                    <Add fontSize='large' />
+                                 </IconButton>
+                              </Fade>
+                           </Box>
+
+                        </Box>
+                     </Flash>
+                  ):(/*» BUSCAR ... */
+                     <Fade>
+                        <Box display='flex' width={320} pl={2} alignItems='center' gridGap={10}>
+                           <Box display='flex' flexDirection='column' alignItems='center'>
+                              <FormControlLabel 
+                                 control={
+                                    <Switch 
+                                       size='small'
+                                       color='primary'
+                                       defaultChecked
+                                       onChange={handleChangeFilterType}
+                                    />
+                                 } 
+                                 label={ filterType === NUMERO_EXPEDIENTE_KEY ? `Buscar por ${NUMERO_OFICIO_LABEL}` : `Buscar por ${NUMERO_EXPEDIENTE_LABEL}` } 
+                              />
+                              <FormControl className={classes.formControl} error={!!mininterDbWarning}>
+                                 <InputLabel>{ filterType === NUMERO_EXPEDIENTE_KEY ? NUMERO_EXPEDIENTE_LABEL : NUMERO_OFICIO_LABEL }</InputLabel>
+                                 <Input autoFocus onChange={handleChangeNumeroTramite} />
+                                 <FormHelperText>{mininterDbWarning}</FormHelperText>
+                              </FormControl>
+                           </Box>
+                           <Button 
+                              variant='contained' 
+                              onClick={() => handleFindByNumeroExpedienteAndUsr(refNumeroTramite.current)}
+                           >
+                              <Search color='inherit' />
+                           </Button>
+                        </Box>
+                     </Fade>
+                  )
+            }
+         </>
          
          {/*» RESULT: `HEAD`  */}
-         <Fade>
-            <Paper variant='outlined' className={classes.paper}>
-               <Box display='flex' px={5} py={1} flexWrap='wrap' justifyContent='space-between'>
-                  <TextField value={nacionalizacionDb?.numeroTramite || ''} label='Nro.Expediente' style={{ width: 120 }} {...commonProps}/>
-                  <TextField value={nacionalizacionDb?.tipoTramite || ''} label='Tipo trámite' style={{ width: 410 }} {...commonProps}/>
-                  <TextField value={nacionalizacionDb?.administrado || ''} label='Administrado' style={{ width: 250 }} {...commonProps}/>
-                  <TextField value={nacionalizacionDb?.dependencia || ''} label='Dependencia' style={{ width: 90 }} {...commonProps} />
-               </Box>
-            </Paper>
-         </Fade>
+         {
+            actionType === NUEVO_KEY
+            && (
+               <Flash>
+                  <Paper variant='outlined' className={classes.paper}>
+                     <Box display='flex' px={5} py={1} flexWrap='wrap' justifyContent='space-between'>
+                        <TextField value={nacionalizacionDb?.numeroTramite || ''} label='Nro.Expediente' style={{ width: 120 }} {...commonProps}/>
+                        <TextField value={nacionalizacionDb?.tipoTramite || ''} label='Tipo trámite' style={{ width: 410 }} {...commonProps}/>
+                        <TextField value={nacionalizacionDb?.administrado || ''} label='Administrado' style={{ width: 250 }} {...commonProps}/>
+                        <TextField value={nacionalizacionDb?.dependencia || ''} label='Dependencia' style={{ width: 90 }} {...commonProps} />
+                     </Box>
+                  </Paper>
+               </Flash>
+            )
+         }
 
          {/*» RESULT: `BODY`  */}
          {
@@ -266,7 +361,7 @@ export default function NuevoExpedienteMininterSubMod(){
                      dataTable={dataTable} 
                      configTable={configTable} 
                      isLoading={mininterDbLoading} 
-                     pageSize={5}
+                     pageSize={10}
                   />
                </Fade>
             </Box>
@@ -305,12 +400,15 @@ export default function NuevoExpedienteMininterSubMod(){
 
          <SimpleModal open={openModalAddMail} setOpen={setOpenModalAddMail}>
             <AddFilePool 
-               data={refFilePoolData.current} 
+               record={refRecordDetExpMininter.current} 
                handleAddMail={handleAddMailToOficio} 
-               /* handleDowloadMail={handleDowloadMail} 
-               handleDeleteMail={handleDeleteMail}  */
+               handleDeleteMail={handleDeleteMail} 
+               handleDowloadMail={handleDownloadMail} 
             />
          </SimpleModal>
+
+         {/*» MODAL LOADING ... */}
+         { mininterDbLoading && <ModalLoader /> }
       </>
    )
 }

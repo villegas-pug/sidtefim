@@ -2,6 +2,9 @@ import {
    DELETE_DET_EXP_MININTER_ERROR,
    DELETE_DET_EXP_MININTER_LOADING,
    DELETE_DET_EXP_MININTER_SUCCESS,
+   DELETE_MAIL_FILE_BY_ID_LOADING,
+   DELETE_MAIL_FILE_BY_ID_SUCCESS,
+   DELETE_MAIL_FILE_BY_ID_ERROR,
    DOWNLOAD_FILE_ERROR,
    DOWNLOAD_FILE_LOADING,
    DOWNLOAD_FILE_SUCCESS,
@@ -38,7 +41,7 @@ const initialState = {
    },
    resumenPlazoOficios: {
       loading: false,
-      data: [],
+      data: {},
       error: null
    },
    fileDownload: {
@@ -87,7 +90,7 @@ export default function expedienteMininterReducer(state = initialState, { type, 
    case FIND_ALL_RESUMEN_PLAZO_OFICIOS_LOADING:
       return { ...state, resumenPlazoOficios: { loading: true, data: {}, error: null} }
    case FIND_ALL_RESUMEN_PLAZO_OFICIOS_SUCCESS:
-      return { ...state, resumenPlazoOficios: { loading: false, data: payload[0], error: null} }
+      return { ...state, resumenPlazoOficios: { loading: false, data: payload[0] || {}, error: null} }
    case FIND_ALL_RESUMEN_PLAZO_OFICIOS_ERROR:
       return { ...state, resumenPlazoOficios: { loading: false, data: {}, error: payload} }
    case DOWNLOAD_FILE_LOADING:
@@ -96,6 +99,12 @@ export default function expedienteMininterReducer(state = initialState, { type, 
       return { ...state, fileDownload: { loading: false, error: null } }
    case DOWNLOAD_FILE_ERROR:
       return { ...state, fileDownload: { loading: false, error: payload } }
+   case DELETE_MAIL_FILE_BY_ID_LOADING:
+      return { ...state, loading: true, error: null }
+   case DELETE_MAIL_FILE_BY_ID_SUCCESS:
+      return { ...state, loading: false, data: { ...state.data, expedienteMininter: payload[0] }, error: null }
+   case DELETE_MAIL_FILE_BY_ID_ERROR:
+      return { ...state, loading: false, error: payload }
    default:
       return state
    }

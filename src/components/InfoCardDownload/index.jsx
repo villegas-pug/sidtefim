@@ -6,7 +6,8 @@ import {
    Grid, 
    Typography, 
    Avatar,
-   IconButton
+   IconButton,
+   CircularProgress
 } from '@material-ui/core'
 import { Download } from '@mui/icons-material'
 import { makeStyles } from '@material-ui/core/styles'
@@ -25,7 +26,7 @@ const useStyle = makeStyles({
    }
 })
 
-export default function InfoCardDownload({icon: Icon, title, value, handleDownload}){
+export default function InfoCardDownload({ icon: Icon, title, value, handleDownload, isLoading }){
 
    /*» HOOK'S  */
    const classes = useStyle()
@@ -46,9 +47,10 @@ export default function InfoCardDownload({icon: Icon, title, value, handleDownlo
                   </Grid>
                   <Grid item container xs={5} alignItems='center' justify='center'>
                      <IconButton
-                        onClick={handleDownload}
+                        onClick={ handleDownload }
+                        disabled={ isLoading || !value }
                      >
-                        <Download fontSize='small' />
+                        { isLoading ? <CircularProgress size={20} color='inherit' /> :  <Download fontSize='small' /> }
                      </IconButton>
                   </Grid>
                </Grid>
@@ -62,5 +64,6 @@ InfoCardDownload.propTypes = {
    icon: PropTypes.func.isRequired,
    title: PropTypes.string.isRequired,
    value: PropTypes.string.isRequired,
+   isLoading: PropTypes.bool.isRequired,
    handleDownload: PropTypes.func.isRequired
 }

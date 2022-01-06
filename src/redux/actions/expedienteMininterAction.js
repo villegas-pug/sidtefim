@@ -3,6 +3,9 @@ import {
    DELETE_DET_EXP_MININTER_ERROR,
    DELETE_DET_EXP_MININTER_LOADING,
    DELETE_DET_EXP_MININTER_SUCCESS,
+   DELETE_MAIL_FILE_BY_ID_ERROR,
+   DELETE_MAIL_FILE_BY_ID_LOADING,
+   DELETE_MAIL_FILE_BY_ID_SUCCESS,
    DOWNLOAD_FILE_ERROR,
    DOWNLOAD_FILE_LOADING,
    DOWNLOAD_FILE_SUCCESS,
@@ -70,13 +73,17 @@ const downloadFileLoading = () => ({ type: DOWNLOAD_FILE_LOADING })
 const downloadFileSuccess = () => ({ type: DOWNLOAD_FILE_SUCCESS })
 const downloadFileError = (payload) => ({ type: DOWNLOAD_FILE_ERROR, payload })
 
+const deleteMailFileByIdLoading = () => ({ type: DELETE_MAIL_FILE_BY_ID_LOADING })
+const deleteMailFileByIdSuccess = (payload) => ({ type: DELETE_MAIL_FILE_BY_ID_SUCCESS, payload })
+const deleteMailFileByIdError = (payload) => ({ type: DELETE_MAIL_FILE_BY_ID_ERROR, payload })
+
 export const findByNumeroExpediente = (numeroTramite) => async (dispatch, getStore) => {
    dispatch(findByNumeroExpedienteLoading())
    try {
       const { usuario: { token } } = getStore()
       const { data: { levelLog, data, message } } = await api({
-         method: 'POST',
-         url: `/microservicio-nacionalizacion/findByNumeroTramite/${numeroTramite}`,
+         method: 'GET',
+         url: `/microservicio-nacionalizacion-dev/findByNumeroTramite/${numeroTramite}`,
          headers: {
             [AUTHORIZATION]: token
          }
@@ -104,7 +111,7 @@ export const findByNumeroExpedienteAndUsr = (numeroTramite) => async (dispatch, 
       const { usuario: { token, userCredentials } } = getStore()
       const { data: { levelLog, data, message } } = await api({
          method: 'POST',
-         url: `/microservicio-nacionalizacion/findByNumeroTramiteAndUsrDig/${numeroTramite}`,
+         url: `/microservicio-nacionalizacion-dev/findByNumeroTramiteAndUsrDig/${numeroTramite}`,
          data: userCredentials,
          headers: {
             [AUTHORIZATION]: token
@@ -133,7 +140,7 @@ export const findAllUbicacionMininter = () => async (dispatch, getStore) => {
       const { usuario: { token } } = getStore()
       const { data: { levelLog, data, message } } = await api({
          method: 'GET',
-         url: '/microservicio-nacionalizacion/findAllUbicacionMininter',
+         url: '/microservicio-nacionalizacion-dev/findAllUbicacionMininter',
          headers: {
             [AUTHORIZATION]: token
          }
@@ -163,7 +170,7 @@ export const saveDetExpMininter = (detExpedienteMininter) => async (dispatch, ge
          expedienteMininter: { data: { nacionalizacion: { numeroTramite } } } } = getStore()
       const { data: { levelLog, data, message } } = await api({
          method: 'POST',
-         url: `/microservicio-nacionalizacion/saveDetExpedienteMininter/${numeroTramite}`,
+         url: `/microservicio-nacionalizacion-dev/saveDetExpedienteMininter/${numeroTramite}`,
          data: detExpedienteMininter,
          headers: {
             [AUTHORIZATION]: token
@@ -197,7 +204,7 @@ export const saveOficioInExpediente = (detExpedienteMininter) => async (dispatch
       } = getStore()
       const { data: { levelLog, data, message } } = await api({
          method: 'POST',
-         url: `/microservicio-nacionalizacion/saveOficioInExpediente/${numeroTramite}`,
+         url: `/microservicio-nacionalizacion-dev/saveOficioInExpediente/${numeroTramite}`,
          data: { detExpedienteMininter, usuario },
          headers: {
             [AUTHORIZATION]: token
@@ -236,7 +243,7 @@ export const saveMailFileInOficio = (detExpedienteMininter, file) => async (disp
 
       const { data: { levelLog, data, message } } = await api({
          method: 'POST',
-         url: '/microservicio-nacionalizacion/saveMailFileInOficio',
+         url: '/microservicio-nacionalizacion-dev/saveMailFileInOficio',
          data: frmData,
          headers: {
             [AUTHORIZATION]: token
@@ -265,12 +272,12 @@ export const deleteDetExpMininter = (detExpedienteMininter) => async (dispatch, 
    dispatch(deleteDetExpMininterLoading())
    try {
       const { 
-         usuario: { token }, 
+         usuario: { token, userCredentials: usuario }, 
          expedienteMininter: { data: { nacionalizacion: { numeroTramite } } } } = getStore()
       const { data: { levelLog, data, message } } = await api({
          method: 'DELETE',
-         url: `/microservicio-nacionalizacion/removeDetExpedienteMininter/${numeroTramite}`,
-         data: detExpedienteMininter,
+         url: `/microservicio-nacionalizacion-dev/removeDetExpedienteMininter/${numeroTramite}`,
+         data: { detExpedienteMininter, usuario },
          headers: {
             [AUTHORIZATION]: token
          }
@@ -298,11 +305,12 @@ export const saveExpedienteMininter = () => async (dispatch, getStore) => {
    dispatch(saveExpedienteMininterLoading())
    try {
       const { 
-         usuario: { token }, 
+         usuario: { token, userCredentials }, 
          expedienteMininter: { data: { nacionalizacion: { numeroTramite } } } } = getStore()
       const { data: { levelLog, data, message } } = await api({
          method: 'POST',
-         url: `/microservicio-nacionalizacion/saveExpedienteMininter/${numeroTramite}`,
+         url: `/microservicio-nacionalizacion-dev/saveExpedienteMininter/${numeroTramite}`,
+         data : userCredentials,
          headers: {
             [AUTHORIZATION]: token
          }
@@ -332,7 +340,7 @@ export const findByUbicacion = (ubicacion) => async (dispatch, getStore) => {
       const { usuario: { token } } = getStore()
       const { data, status, headers } = await api({
          method: 'POST',
-         url: '/microservicio-nacionalizacion/findByUbicacion',
+         url: '/microservicio-nacionalizacion-dev/findByUbicacion',
          data: ubicacion,
          responseType: 'blob',
          headers: {
@@ -363,7 +371,7 @@ export const findAllResumenPlazoOficios = () => async (dispatch, getStore) => {
       const { usuario: { token, userCredentials } } = getStore()
       const { data: { levelLog, data, message } } = await api({
          method: 'POST',
-         url: '/microservicio-nacionalizacion/**',
+         url: '/microservicio-nacionalizacion-dev/findAllPlazosOficio',
          data: userCredentials,
          headers: {
             [AUTHORIZATION]: token
@@ -394,7 +402,7 @@ export const downloadFileResumenPlazoOficios = (estadoPlazo) => async (dispatch,
       const { usuario: { token, userCredentials } } = getStore()
       const { data, status, headers, statusText } = await api({
          method: 'POST',
-         url: `/microservicio-nacionalizacion/**/${estadoPlazo}`,
+         url: `/microservicio-nacionalizacion-dev/downloadPlazosOficio/${estadoPlazo}`,
          data: userCredentials,
          headers: {
             [AUTHORIZATION]: token
@@ -418,13 +426,13 @@ export const downloadFileResumenPlazoOficios = (estadoPlazo) => async (dispatch,
    }
 }
 
-export const downloadMailFile = (idMail) => async (dispatch, getStore) => {
+export const downloadMailFile = (idMailFile) => async (dispatch, getStore) => {
    dispatch(downloadFileLoading())
    try {
       const { usuario: { token } } = getStore()
       const { data, status, headers, statusText } = await api({
          method: 'GET',
-         url: `/microservicio-nacionalizacion/**/${idMail}`,
+         url: `/microservicio-nacionalizacion-dev/downloadMailFile/${idMailFile}`,
          headers: {
             [AUTHORIZATION]: token
          },
@@ -444,5 +452,41 @@ export const downloadMailFile = (idMail) => async (dispatch, getStore) => {
       }
    } catch (err) {
       dispatch(currentHttpStatus(err.response?.status))
+   }
+}
+
+export const deleteMailFileById = (idMailFile) => async (dispatch, getStore) => {
+   dispatch(deleteMailFileByIdLoading())
+   try {
+      const { 
+         usuario: { token, userCredentials },
+         expedienteMininter: { data: { nacionalizacion: { numeroTramite } } }
+      } = getStore()
+
+      const { data: { levelLog, data, message } } = await api({
+         method: 'POST',
+         url: `/microservicio-nacionalizacion-dev/removeMailFileById/${numeroTramite}/${idMailFile}`,
+         data: userCredentials,
+         headers: {
+            [AUTHORIZATION]: token
+         }
+      })
+
+      switch (levelLog) {
+      case SUCCESS:
+         dispatch(deleteMailFileByIdSuccess(data))
+         Noty(SUCCESS, message)
+         break
+      case WARNING:
+         dispatch(deleteMailFileByIdError(message))
+         Noty(WARNING, message)
+         break
+      case ERROR:
+         dispatch(deleteMailFileByIdError(message))
+         Noty(ERROR, message)
+         break
+      }
+   } catch (err) {
+      dispatch(currentHttpStatus(err.response?.status))      
    }
 }
