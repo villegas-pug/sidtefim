@@ -6,7 +6,7 @@ import {
    Typography
 } from '@material-ui/core'
 
-function Table(props) {
+export default function Table(props) {
 
    const {
       isLoading,
@@ -32,7 +32,7 @@ function Table(props) {
                rowStyle: { fontSize: 10, textTransform: 'uppercase' },
             }}
             localization={{ 
-               header: { actions: '««»»' }, 
+               header: { actions: '«»' }, 
                pagination: { 
                   labelDisplayedRows: '{from}-{to} de {count}',
                   firstTooltip: '',
@@ -42,7 +42,7 @@ function Table(props) {
                },
                body:{
                   emptyDataSourceMessage:(
-                     <Typography variant='h3' color='textSecondary'>««« »»»</Typography>
+                     <Typography variant='h3' color='textSecondary'>«« »»</Typography>
                   )
                }
             }}
@@ -76,4 +76,4 @@ Table.propTypes = {
    options: PropTypes.object.isRequired
 }
 
-export default React.memo(Table, (prevProps, nextProps) => prevProps.isLoading === nextProps.isLoading) 
+/* export default React.memo(Table, (prevProps, nextProps) => prevProps.isLoading === nextProps.isLoading)  */

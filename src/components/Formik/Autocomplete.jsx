@@ -44,7 +44,7 @@ export default function MyAutocomplete({ name, label, width, opt, handleChangeUn
          noOptionsText='¡No hay registros!'
          loadingText='Cargando...'
          options={opt}
-         getOptionLabel={(obj) => (Object.values(obj)[1])}/*» Drop down list label...  */
+         getOptionLabel={(obj) => Object.values(obj)[1]}/*» Drop down list label...  */
          style={{ width: `${width}rem`}}
          renderInput={(params) => (
             <Field

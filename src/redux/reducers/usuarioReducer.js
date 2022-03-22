@@ -1,4 +1,7 @@
 import { 
+   FIND_ALL_USER_ERROR,
+   FIND_ALL_USER_LOADING,
+   FIND_ALL_USER_SUCCESS,
    FIND_USER_BY_LOGIN_ERROR, 
    FIND_USER_BY_LOGIN_LOADING, 
    FIND_USER_BY_LOGIN_SUCCESS, 
@@ -19,6 +22,11 @@ const initialState = {
    token: window.localStorage.getItem(AUTHORIZATION),
    userCredentials: {},
    error: null,
+   users: {
+      loading: false,
+      data: [],
+      error: null
+   }
 }
 
 export default function usuarioReducer(state = initialState, { type, payload }) {
@@ -49,6 +57,12 @@ export default function usuarioReducer(state = initialState, { type, payload }) 
       return { ...state, loading: false, error: payload }
    case LOGOUT_SUCCESS:
       return {...state, token: '', userAuth: '', userCredentials: {}}
+   case FIND_ALL_USER_LOADING:
+      return { ...state, users: { loading: true, data: [], error: null } }
+   case FIND_ALL_USER_SUCCESS:
+      return { ...state, users: { loading: false, data: payload, error: null } }
+   case FIND_ALL_USER_ERROR:
+      return { ...state, users: { loading: false, data: [], error: payload } }
    default:
       return state
    }

@@ -32,15 +32,14 @@ export default function SpeedDials({direction, optSpeedDialAction, ...rest}) {
          direction={direction}
       >
          {
-            optSpeedDialAction.map(({tooltip, handleOnClick, icon, fabProps}) => (
+            optSpeedDialAction.map(({tooltip, handleOnMouseDown, handleOnMouseUp, handleOnClick, icon, fabProps}) => (
                <SpeedDialAction
                   key={tooltip}
                   tooltipTitle={tooltip}
                   icon={icon}
-                  onClick={() => {
-                     handleOnClick()
-                     handleClose()
-                  }}
+                  onClick={handleOnClick}
+                  onMouseDown={handleOnMouseDown}
+                  onMouseUp={handleOnMouseUp}
                   color='primary'
                   FabProps={{...fabProps}}
                />

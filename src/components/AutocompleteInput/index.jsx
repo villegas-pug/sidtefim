@@ -10,7 +10,7 @@ const sleep = (delay = 0) => {
    })
 }
 
-function MenuAutocomplete({placeholder, width, variant, config, data, inputValue}) {
+function MenuAutocomplete({ placeholder, width, variant, config, data, inputValue }) {
    const { selected: handleSelected, label: handleLabel, onInputChange } = config
 
    const [open, setOpen] = React.useState(false)
@@ -39,7 +39,7 @@ function MenuAutocomplete({placeholder, width, variant, config, data, inputValue
          inputValue={inputValue}/*-> Estado...  */
          onInputChange={onInputChange}
          autoSave='false'
-         style={{ width: width }}
+         style={{ width }}
          open={open}
          onOpen={() => setOpen(true)}
          onClose={() => setOpen(false)}

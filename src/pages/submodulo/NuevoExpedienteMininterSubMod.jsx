@@ -66,7 +66,7 @@ export default function NuevoExpedienteMininterSubMod(){
       mininterDbWarning,
       isNewToMiniter,
       isOldToMininter,
-      handleFindByNumeroExpedienteAndUsr,
+      handleFindByNumeroExpediente,
       handleFindAllUbicacionMininter,
       handleDeleteDetExpeMininter,
       handleSaveExpedienteMininter
@@ -152,7 +152,7 @@ export default function NuevoExpedienteMininterSubMod(){
                   </FormControl>
                   <Button 
                      variant='contained' 
-                     onClick={() => handleFindByNumeroExpedienteAndUsr(refNumeroTramite.current)}
+                     onClick={() => handleFindByNumeroExpediente(refNumeroTramite.current)}
                   >
                      <Search color='inherit' />
                   </Button>

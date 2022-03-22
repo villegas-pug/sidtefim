@@ -47,7 +47,7 @@ import { APP_BAR, SIDE_BAR } from 'constants/layout'
 import { modulo } from 'constants/components'
 import useAuth from 'hooks/useAuth'
 
-const drawerWidth = 150
+const drawerWidth = 170
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -122,7 +122,7 @@ const useStyles = makeStyles((theme) => ({
 export default function MyDrawer({ children, ...rest }) {
    
    /*-> HOOK'S...  */
-   const [selectedItemDrawer, setSelectedItemDrawer] = useState(-1)
+   const [selectedItemDrawer, setSelectedItemDrawer] = useState(0)
    const [anchorEl, setAnchorEl] = useState(null)
    const [open, setOpen] = useState(false)
    const [selectedTab, setSelectedTab] = useState(modulo.HOME)

@@ -30,7 +30,14 @@ import {
    Flag,
    CardMembership,
    Man,
-   Woman
+   Woman,
+   SendAndArchive,
+   MarkEmailRead,
+   MarkEmailUnread,
+   HourglassDisabled,
+   AccountTree,
+   FactCheck,
+   SupportAgent
 } from '@mui/icons-material'
 
 const classes = {
@@ -64,11 +71,14 @@ export const Icons = {
    Settings: <Settings fontSize='small' />,
    LiveHelp: <LiveHelp fontSize='small' />,
    BarChartRounded: <BarChartRounded fontSize='small' />,
+   AccountTree: <AccountTree fontSize='small' />,
 
    /*» SUB-MOD'S...  */
    Create: <AddCircle color='action' style={classes.subModIcon} />,
    FindInPage: <FindInPage color='action' style={classes.subModIcon} />,
    TrendingUp: <TrendingUp color='action' style={classes.subModIcon} />,
+   SupportAgent: <SupportAgent color='action' style={classes.subModIcon} />,
+   FactCheck: <FactCheck color='action' style={classes.subModIcon} />,
    
    Test: <Build />,
    Cloud: <Cloud />,
@@ -78,5 +88,12 @@ export const Icons = {
    DetailPanel: <ChevronRight />,
    Edit: <Edit />,
    PageviewRounded: <PageviewRounded />,
+
+   /*» ...  */
+   SendAndArchive: <SendAndArchive fontSize='large' />,
+   MarkEmailRead: <MarkEmailRead fontSize='large' />,
+   MarkEmailUnread: <MarkEmailUnread fontSize='large' />,
+   HourglassDisabled: <HourglassDisabled fontSize='large' />
+
 }
 

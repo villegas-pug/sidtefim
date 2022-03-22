@@ -26,7 +26,9 @@ export default function ModalLoader(){
 
    return (
       <>
-         <Fade>
+         <Fade
+            zoom
+         >
             <body className={clasess.box}>
                <PropagateLoader color='#004795' size={25} />
             </body>

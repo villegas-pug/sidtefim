@@ -5,8 +5,8 @@ import {
    Stepper,
    Step,
    StepLabel,
+   Typography
 } from '@material-ui/core'
-
 
 const useStyles = makeStyles({
    root: {
@@ -20,16 +20,18 @@ const useStyles = makeStyles({
    }
 })
 
-export default function StepperMui({ activeStep, steps }) {
+export default function StepperMui({ activeStep, steps, orientation = 'horizontal' }) {
    const classes = useStyles()
 
    return (
       <div className={classes.root}>
-         <Stepper activeStep={activeStep - 1}>
+         <Stepper activeStep={activeStep - 1} orientation={orientation}>
             {
                steps?.map(({ stage, description }) => (
                   <Step className={classes.step} key={stage} >
-                     <StepLabel>{description}</StepLabel>
+                     <StepLabel>
+                        <Typography variant='h5'>{description}</Typography>
+                     </StepLabel>
                   </Step>
                ))
             }
@@ -40,5 +42,6 @@ export default function StepperMui({ activeStep, steps }) {
 
 StepperMui.propTypes = {
    activeStep: PropTypes.number.isRequired, 
-   steps: PropTypes.array.isRequired
+   steps: PropTypes.array.isRequired,
+   orientation: PropTypes.string
 }

@@ -5,6 +5,9 @@ import {
    ERROR,
 } from 'constants/levelLog'
 import { 
+   FIND_ALL_USER_ERROR,
+   FIND_ALL_USER_LOADING,
+   FIND_ALL_USER_SUCCESS,
    FIND_USER_BY_LOGIN_ERROR,
    FIND_USER_BY_LOGIN_LOADING, 
    FIND_USER_BY_LOGIN_SUCCESS, 
@@ -19,6 +22,7 @@ import {
 import Noty from 'helpers/noty'
 
 import { AUTHORIZATION, USER_AUTH } from 'constants/localStorage'
+import { currentHttpStatus } from './httpStatusAction'
 
 const findUserByLoginLoading = () => ({ type: FIND_USER_BY_LOGIN_LOADING })
 const findUserByLoginSuccess = (payload) => ({ type: FIND_USER_BY_LOGIN_SUCCESS, payload })
@@ -32,7 +36,39 @@ const updatePasswordByLoginLoading = () => ({type: UPDATE_PASSWORD_BY_LOGIN_LOAD
 const updatePasswordByLoginSuccess = () => ({type: UPDATE_PASSWORD_BY_LOGIN_SUCCESS})
 const updatePasswordByLoginError = (payload) => ({type: UPDATE_PASSWORD_BY_LOGIN_ERROR, payload})
 
-export const logout = () => (window.localStorage.clear(), { type: LOGOUT_SUCCESS })
+const findAllUserLoading = () => ({ type: FIND_ALL_USER_LOADING })
+const findAllUserSuccess = (payload) => ({ type: FIND_ALL_USER_SUCCESS, payload })
+const findAllUserError = (payload) => ({ type: FIND_ALL_USER_ERROR, payload })
+
+export const logout = () => ( window.localStorage.clear(), { type: LOGOUT_SUCCESS })
+
+export const findAllUser = () => async (dispatch, getStore) => {
+   try {
+      dispatch(findAllUserLoading())
+      const { usuario: { token  } } = getStore()
+      const { data: { levelLog, data, message } } = await api({
+         method: 'GET',
+         url: '/microservicio-usuario/findAll',
+         headers: {
+            [AUTHORIZATION]: token
+         }
+      })
+   
+      switch (levelLog) {
+      case SUCCESS:
+         dispatch(findAllUserSuccess(data))
+         break
+      case WARNING:
+         dispatch(findAllUserError(message))
+         break
+      case ERROR:
+         dispatch(findAllUserError(message))
+         break
+      }
+   } catch (err) {
+      dispatch(currentHttpStatus(err.response?.status))
+   }
+}
 
 export const findUserByLogin = () => async (dispatch, getStore) => {
    try {

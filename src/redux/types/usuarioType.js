@@ -10,4 +10,8 @@ export const UPDATE_PASSWORD_BY_LOGIN_LOADING = '[usuario] Update password by lo
 export const UPDATE_PASSWORD_BY_LOGIN_SUCCESS = '[usuario] Update password by login success'
 export const UPDATE_PASSWORD_BY_LOGIN_ERROR = '[usuario] Update password by login error'
 
+export const FIND_ALL_USER_LOADING = '[usuario] Find all user loading'
+export const FIND_ALL_USER_SUCCESS = '[usuario] Find all user success'
+export const FIND_ALL_USER_ERROR = '[usuario] Find all user error'
+
 export const LOGOUT_SUCCESS = '[usuario] Logout success'

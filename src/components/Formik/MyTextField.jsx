@@ -29,8 +29,8 @@ export default function MyTextField({ type, size, label, focused, ...rest }) {
 }
 
 MyTextField.propTypes = {
-   type: PropTypes.string.isRequired, 
-   size: PropTypes.number.isRequired, 
+   type: PropTypes.string, 
+   size: PropTypes.number, 
    label: PropTypes.string.isRequired, 
-   focused: PropTypes.bool.isRequired
+   focused: PropTypes.bool
 }

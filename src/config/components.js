@@ -4,10 +4,11 @@ import { lazy } from 'react'
 const HomeMod = lazy(() => import('pages/modulo/HomeMod'))
 const ActividadesMod = lazy(() => import('pages/modulo/ActividadesMod'))
 const PerfilMod = lazy(() => import('pages/modulo/PerfilMod'))
-const UtilidadesMod = lazy(() => import('pages/modulo/UtilidadesMod'))
-const ReporteMod = lazy(() => import('pages/modulo/ReportesMod'))
 const LineamientoMod = lazy(() => import('pages/modulo/LineamientosMod'))
 const ProcesosMod = lazy(() => import('pages/modulo/ProcesosMod'))
+const UtilidadesMod = lazy(() => import('pages/modulo/UtilidadesMod'))
+const GestionTramiteMod = lazy(() => import('pages/modulo/GestionTramiteMod'))
+const ReporteMod = lazy(() => import('pages/modulo/ReportesMod'))
 
 /*» SUBMOD'S  */
 const RptMesaDigitalSubMod = lazy(() => import('pages/submodulo/MesaDigitalRptSubMod'))
@@ -17,6 +18,7 @@ const NuevaActividadSubMod = lazy(() => import('pages/submodulo/NuevaActividadSu
 const NuevoExpedienteMininterSubMod = lazy(() => import('pages/submodulo/NuevoExpedienteMininterSubMod'))
 const NuevoOficioSubMod = lazy(() => import('pages/submodulo/NuevoOficioSubMod'))
 const NuevaCeremoniaSubMod = lazy(() => import('pages/submodulo/NuevaCeremoniaSubMod'))
+const NuevoExpedienteSFMSubMod = lazy(() => import('pages/submodulo/NuevoExpedienteSFMSubMod'))
 const BuscarInterpolSubMod = lazy(() => import('pages/submodulo/BuscarInterpolSubMod'))  
 const BuscarOperativoSubMod = lazy(() => import('pages/submodulo/BuscarOperativoSubMod'))
 const BuscarPreInscripcionSubMod = lazy(() => import('pages/submodulo/BuscarPreInscripcionSubMod'))
@@ -26,8 +28,9 @@ const RegistrarActividad = lazy(() => import('pages/submodulo/RegistrarActividad
 const ProduccionRptSubMod = lazy(() => import('pages/submodulo/ProduccionRptSubMod'))
 const NacionalizacionRptSubMod = lazy(() => import('pages/submodulo/NacionalizacionRptSubMod'))
 const ExpedienteMininterRptSubMod = lazy(() => import('pages/submodulo/ExpedienteMininterRptSubMod'))
-
-
+const AsignarExpedienteNacSubMod = lazy(() => import('pages/submodulo/AsignarExpedienteNacSubMod'))
+const EvaluarExpedienteNacSubMod = lazy(() => import('pages/submodulo/EvaluarExpedienteNacSubMod'))
+const RecepcionAsignacionSFMSubMod = lazy(() => import('pages/submodulo/RecepcionAsignacionSFMSubMod')) 
 
 /*» ITEM'S */
 const PendientesRptItem = lazy(() => import('components/Nacionalizacion/Item/PendientesRptItem'))
@@ -53,7 +56,10 @@ const modulo = [
    }, {
       name: modName.UTILIDADES,
       component: UtilidadesMod
-   },  {
+   }, {
+      name: modName.GESTION_TRAMITES,
+      component: GestionTramiteMod
+   }, {
       name: modName.REPORTES,
       component: ReporteMod
    },
@@ -78,6 +84,9 @@ const subModulo = [
    }, {
       name: subModName.NUEVA_CEREMONIA,
       component: NuevaCeremoniaSubMod
+   }, {
+      name: subModName.NUEVO_EXPEDIENTE_SFM,
+      component: NuevoExpedienteSFMSubMod
    }, {
       name: subModName.BUSCAR_OPERATIVO,
       component: BuscarOperativoSubMod
@@ -108,6 +117,15 @@ const subModulo = [
    }, {
       name: subModName.REPORTE_EXPEDIENTES_MININTER,
       component: ExpedienteMininterRptSubMod
+   }, {
+      name: subModName.ASIGNAR_EXPEDIENTES_NAC,
+      component: AsignarExpedienteNacSubMod
+   }, {
+      name: subModName.EVALUAR_EXPEDIENTE_NAC,
+      component: EvaluarExpedienteNacSubMod
+   }, {
+      name: subModName.RECEPCION_Y_ASIGNACION_SFM,
+      component: RecepcionAsignacionSFMSubMod
    }
 ]
 

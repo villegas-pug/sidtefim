@@ -1,0 +1,2 @@
+export const EVALUADOR = 'EVALUADOR'
+export const CORDINADOR = 'CORDINADOR'
